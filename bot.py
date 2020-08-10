@@ -40,9 +40,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.content.startswith('!status'):
-        await message.channel.send('Checking server status...')
-
+    if message.content.strip() in ['!playing', '!status']:
         try:
             mc_status = mc_server.status()
             mc_query = mc_server.query()
@@ -51,20 +49,15 @@ async def on_message(message):
             max_ppl = mc_status.players.max
             players = mc_query.players.names
 
-            main_status = f'**online** with {online_ppl}/{max_ppl} players!'
+            main_status = f'**online** with {online_ppl}/{max_ppl} players'
             if online_ppl > 0:
-                extra_status = 'Players online:\n' + '\n'.join([f'{i + 1}. {player}' for (i, player) in enumerate(players)])
+                main_status += ':\n' + '\n'.join([f'{i + 1}. {player}' for (i, player) in enumerate(players)])
             else:
-                extra_status = None
+                main_status += '!'
         except Exception as ex:
             main_status = '**offline**!'
-            extra_status = None
 
         await message.channel.send(f'The server is {main_status}')
-        if extra_status is not None:
-            await message.channel.send(extra_status)
-
-
 
 
 if __name__ == '__main__':
