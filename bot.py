@@ -40,7 +40,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.content.strip() in ['!playing', '!status']:
+    if message.content.strip() in ['!whodis', '!watsup', '!whatsup', '!status', '!online', '!playing']:
         try:
             mc_status = mc_server.status()
             mc_query = mc_server.query()
