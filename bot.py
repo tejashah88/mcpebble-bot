@@ -30,6 +30,7 @@ async def update_status():
             status = discord.Status.online
             status_msg = f'Online: {online_ppl}/{max_ppl} players!'
     except:
+        status = discord.Status.do_not_disturb
         status_msg = 'Offline'
 
     await bot.change_presence(
