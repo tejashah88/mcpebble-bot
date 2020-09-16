@@ -71,11 +71,15 @@ async def on_message(message):
 
 # Source: https://www.roguelynn.com/words/asyncio-graceful-shutdowns/
 async def shutdown(signal, loop):
-    tasks = [task for task in asyncio.all_tasks() if task is not asyncio.current_task()]
-    [task.cancel() for task in tasks]
+    await cron.stop()
+    await bot.change_presence(status=discord.Status.invisible)
+    await bot.logout()
+    print('Logged out!')
 
-    print(f"Cancelling {len(tasks)} outstanding tasks")
+    tasks = [task for task in asyncio.all_tasks() if task is not asyncio.current_task()]
+    print(f'Cancelling {len(tasks)} outstanding tasks')
     await asyncio.gather(*tasks, return_exceptions=True)
+
     loop.stop()
 
 
@@ -88,16 +92,10 @@ if __name__ == '__main__':
         signal_handler_fn = lambda signal=signal: asyncio.create_task(shutdown(signal, loop))
         loop.add_signal_handler(signal, signal_handler_fn)
 
-    # Shamelessly copied from https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.run
-    # HACK: Probably shouldn't be spamming `loop.run_until_complete`!
     print('Initializing bot...')
     try:
-        loop.run_until_complete(cron.start())
-        loop.run_until_complete(bot.start(BOT_TOKEN))
-    except KeyboardInterrupt:
-        loop.run_until_complete(bot.change_presence(status=discord.Status.invisible))
-        loop.run_until_complete(bot.logout())
-        loop.run_until_complete(cron.stop())
-        print('Logged out!')
+        loop.create_task(cron.start())
+        loop.create_task(bot.start(BOT_TOKEN))
+        loop.run_forever()
     finally:
         loop.close()
