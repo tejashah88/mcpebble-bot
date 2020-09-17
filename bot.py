@@ -58,12 +58,16 @@ async def on_message(message):
             online_ppl = mc_status.players.online
             max_ppl = mc_status.players.max
             players = mc_query.players.names
+            motd = mc_status.description['extra'][0]['text']
 
-            main_status = f'**online** with {online_ppl}/{max_ppl} players'
-            if online_ppl > 0:
-                main_status += ':\n' + '\n'.join([f'{i + 1}. {player}' for (i, player) in enumerate(players)])
+            if MAINTENANCE_MOTD == motd:
+                main_status = '**under maintenance**!'
             else:
-                main_status += '!'
+                main_status = f'**online** with {online_ppl}/{max_ppl} players'
+                if online_ppl > 0:
+                    main_status += ':\n' + '\n'.join([f'{i + 1}. {player}' for (i, player) in enumerate(players)])
+                else:
+                    main_status += '!'
         except Exception as ex:
             main_status = '**offline**!'
 
