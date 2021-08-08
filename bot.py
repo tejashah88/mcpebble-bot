@@ -21,7 +21,7 @@ async def update_status():
         mc_status = mc_server.status()
         online_ppl = mc_status.players.online
         max_ppl = mc_status.players.max
-        motd = mc_status.description['extra'][0]['text']
+        motd = mc_status.description
 
         if MAINTENANCE_MOTD == motd:
             status = discord.Status.do_not_disturb
@@ -29,7 +29,7 @@ async def update_status():
         else:
             status = discord.Status.online
             status_msg = f'Online: {online_ppl}/{max_ppl} players!'
-    except:
+    except Exception as ex:
         status = discord.Status.do_not_disturb
         status_msg = 'Offline'
 
@@ -78,7 +78,7 @@ async def on_message(message):
 async def shutdown(signal, loop):
     await cron.stop()
     await bot.change_presence(status=discord.Status.invisible)
-    await bot.logout()
+    await bot.close()
     print('Logged out!')
 
     tasks = [task for task in asyncio.all_tasks() if task is not asyncio.current_task()]
